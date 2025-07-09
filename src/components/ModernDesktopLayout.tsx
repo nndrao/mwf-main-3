@@ -22,7 +22,12 @@ import {
   Download,
   Upload,
   Send,
-  Archive
+  Archive,
+  PenTool,
+  Info,
+  MessageSquare,
+  Activity,
+  UserPlus
 } from 'lucide-react';
 import { Task } from '../types';
 import { useTasks } from '../hooks/useTasks';
@@ -39,6 +44,7 @@ const ModernDesktopLayout: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<Partial<Task>>({});
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   
   const {
     tasks: allTasks,
@@ -327,6 +333,57 @@ const ModernDesktopLayout: React.FC = () => {
               </div>
             </div>
           </header>
+
+          {/* Action Toolbar - Only visible when viewing tasks */}
+          {activeView !== 'dashboard' && (
+            <div className="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <button 
+                    disabled={selectedTaskIds.size === 0}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:bg-transparent dark:disabled:hover:border-gray-600">
+                    <PenTool size={16} className="text-gray-500" />
+                    <span>Initiate Sign Off</span>
+                  </button>
+                  
+                  <button 
+                    disabled={selectedTaskIds.size === 0}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:bg-transparent dark:disabled:hover:border-gray-600">
+                    <Info size={16} className="text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
+                    <span>Request Info</span>
+                  </button>
+                  
+                  <button 
+                    disabled={selectedTaskIds.size === 0}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-green-400 dark:hover:border-green-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:bg-transparent dark:disabled:hover:border-gray-600">
+                    <MessageSquare size={16} className="text-gray-500 group-hover:text-green-600 dark:group-hover:text-green-400" />
+                    <span>Add Notes</span>
+                  </button>
+                  
+                  <button 
+                    disabled={selectedTaskIds.size === 0}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-purple-400 dark:hover:border-purple-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:bg-transparent dark:disabled:hover:border-gray-600">
+                    <Activity size={16} className="text-gray-500 group-hover:text-purple-600 dark:group-hover:text-purple-400" />
+                    <span>View Activity</span>
+                  </button>
+                  
+                  <button 
+                    disabled={selectedTaskIds.size === 0}
+                    className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-orange-400 dark:hover:border-orange-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:bg-transparent dark:disabled:hover:border-gray-600">
+                    <UserPlus size={16} className="text-gray-500 group-hover:text-orange-600 dark:group-hover:text-orange-400" />
+                    <span>Delegate</span>
+                  </button>
+                </div>
+                
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {selectedTaskIds.size > 0 
+                    ? `${selectedTaskIds.size} task${selectedTaskIds.size > 1 ? 's' : ''} selected`
+                    : 'No tasks selected'
+                  }
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Content Area */}
           <div className="flex-1 overflow-auto p-6">

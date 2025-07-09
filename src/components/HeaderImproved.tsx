@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, MoreHorizontal, MessageSquare, Activity, UserPlus, Info, Menu, Bell } from 'lucide-react';
+import { User, MoreHorizontal, MessageSquare, Activity, UserPlus, Info, Menu, Bell, PenTool } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 const HeaderImproved: React.FC = () => {
@@ -7,10 +7,11 @@ const HeaderImproved: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const actions = [
-    { icon: Info, label: 'Request Info', color: 'bg-blue-600 hover:bg-blue-700' },
-    { icon: MessageSquare, label: 'Add Notes', color: 'bg-green-600 hover:bg-green-700' },
-    { icon: Activity, label: 'Activity', color: 'bg-purple-600 hover:bg-purple-700' },
-    { icon: UserPlus, label: 'Delegate', color: 'bg-orange-600 hover:bg-orange-700' },
+    { icon: PenTool, label: 'Initiate Sign Off', iconColor: 'text-gray-200' },
+    { icon: Info, label: 'Request Info', iconColor: 'text-blue-300' },
+    { icon: MessageSquare, label: 'Add Notes', iconColor: 'text-green-300' },
+    { icon: Activity, label: 'Activity', iconColor: 'text-purple-300' },
+    { icon: UserPlus, label: 'Delegate', iconColor: 'text-orange-300' },
   ];
 
   return (
@@ -59,17 +60,17 @@ const HeaderImproved: React.FC = () => {
       {/* Expandable action menu with improved animations */}
       {showActions && (
         <div className="px-4 pb-4 border-t border-white/20 animate-in slide-in-from-top duration-200">
-          <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4">
             {actions.map((action, index) => {
               const Icon = action.icon;
               return (
                 <button
                   key={index}
                   onClick={() => setShowActions(false)}
-                  className={`${action.color} text-white py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 active:scale-95`}
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 text-white py-2 px-3 rounded-lg hover:bg-white/20 hover:border-white/30 transition-all duration-200 flex items-center justify-center space-x-2 active:scale-95"
                 >
-                  <Icon size={18} />
-                  <span>{action.label}</span>
+                  <Icon size={16} className={action.iconColor} />
+                  <span className="text-sm font-medium">{action.label}</span>
                 </button>
               );
             })}
