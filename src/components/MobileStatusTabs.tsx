@@ -97,10 +97,12 @@ const MobileStatusTabs: React.FC<MobileStatusTabsProps> = ({ tasks, activeStatus
                     </span>
                   )}
                 </div>
-                <span className="text-xs font-semibold mt-1">{tab.label}</span>
-                {activeStatus === tab.id && (
-                  <span className="text-xs font-bold mt-0.5">{count}</span>
-                )}
+                <span className="text-xs font-semibold mt-1">
+                  {tab.label}
+                  {activeStatus === tab.id && (
+                    <span className="text-xs font-bold ml-1">({count})</span>
+                  )}
+                </span>
               </button>
             );
           })}

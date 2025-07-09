@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   CheckCircle2, 
@@ -32,9 +32,101 @@ import {
 import { Task } from '../types';
 import { useTasks } from '../hooks/useTasks';
 import { format } from 'date-fns';
-import { ThemeProvider } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 import ControlInstructions from './ControlInstructions';
+import { AgGridReact } from 'ag-grid-react';
+import { ColDef, ModuleRegistry, themeQuartz, AllCommunityModule } from 'ag-grid-community';
+import { 
+  StatusCellRenderer, 
+  PriorityCellRenderer, 
+  TaskCellRenderer, 
+  ActionsCellRenderer 
+} from './AgGridCellRenderers';
+import { useTheme } from '../contexts/ThemeContext';
+
+// Register AG-Grid modules
+ModuleRegistry.registerModules([AllCommunityModule]);
+
+// Define theme configuration with light and dark modes
+const customTheme = themeQuartz
+  .withParams(
+    {
+      // Font settings
+      fontSize: 14,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+      
+      // Row settings
+      rowHeight: 52,
+      headerHeight: 44,
+      
+      // Spacing
+      cellHorizontalPadding: 24,
+      spacing: 8,
+      
+      // Border settings
+      borderRadius: 12,
+      wrapperBorderRadius: 12,
+      cellHorizontalBorder: false,
+      rowBorder: true,
+      
+      // Light mode colors
+      backgroundColor: '#ffffff',
+      foregroundColor: '#111827', // gray-900
+      borderColor: '#e5e7eb', // gray-200
+      chromeBackgroundColor: '#f9fafb', // gray-50
+      oddRowBackgroundColor: 'transparent',
+      headerBackgroundColor: '#f9fafb', // gray-50
+      headerTextColor: '#6b7280', // gray-500
+      rowHoverColor: '#f9fafb', // gray-50
+      selectedRowBackgroundColor: '#dbeafe', // blue-100
+      rangeSelectionBackgroundColor: '#dbeafe', // blue-100
+      rangeSelectionBorderColor: '#3b82f6', // blue-500
+      accentColor: '#D71E2B', // Wells Fargo red
+      headerFontWeight: 500,
+      headerVerticalPaddingScale: 0.8,
+      browserColorScheme: 'light'
+    },
+    'light'
+  )
+  .withParams(
+    {
+      // Font settings
+      fontSize: 14,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
+      
+      // Row settings
+      rowHeight: 52,
+      headerHeight: 44,
+      
+      // Spacing
+      cellHorizontalPadding: 24,
+      spacing: 8,
+      
+      // Border settings
+      borderRadius: 12,
+      wrapperBorderRadius: 12,
+      cellHorizontalBorder: false,
+      rowBorder: true,
+      
+      // Dark mode colors
+      backgroundColor: '#1f2937', // gray-800
+      foregroundColor: '#ffffff',
+      borderColor: '#374151', // gray-700
+      chromeBackgroundColor: '#374151', // gray-700
+      oddRowBackgroundColor: 'transparent',
+      headerBackgroundColor: '#374151', // gray-700
+      headerTextColor: '#9ca3af', // gray-400
+      rowHoverColor: '#374151', // gray-700
+      selectedRowBackgroundColor: '#1e3a8a', // blue-900
+      rangeSelectionBackgroundColor: '#1e3a8a', // blue-900
+      rangeSelectionBorderColor: '#60a5fa', // blue-400
+      accentColor: '#D71E2B', // Wells Fargo red
+      headerFontWeight: 500,
+      headerVerticalPaddingScale: 0.8,
+      browserColorScheme: 'dark'
+    },
+    'dark'
+  );
 
 const ModernDesktopLayout: React.FC = () => {
   const [activeView, setActiveView] = useState('dashboard');
@@ -45,6 +137,7 @@ const ModernDesktopLayout: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<Partial<Task>>({});
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const { theme: currentTheme } = useTheme();
   
   const {
     tasks: allTasks,
@@ -160,9 +253,98 @@ const ModernDesktopLayout: React.FC = () => {
     }
   };
 
+  // AG-Grid Column Definitions
+  const columnDefs = useMemo<ColDef<Task>[]>(() => [
+    {
+      field: 'title' as keyof Task,
+      headerName: 'Task',
+      cellRenderer: TaskCellRenderer,
+      flex: 2,
+      minWidth: 250
+    },
+    {
+      field: 'status' as keyof Task,
+      headerName: 'Status',
+      cellRenderer: StatusCellRenderer,
+      width: 120
+    },
+    {
+      field: 'priority' as keyof Task,
+      headerName: 'Priority',
+      cellRenderer: PriorityCellRenderer,
+      width: 130
+    },
+    {
+      field: 'dueDate' as keyof Task,
+      headerName: 'Due Date',
+      valueFormatter: (params) => {
+        if (!params.value) return '';
+        const date = params.value instanceof Date ? params.value : new Date(params.value);
+        return format(date, 'MMM dd, yyyy');
+      },
+      width: 120
+    },
+    {
+      field: 'assignedTo' as keyof Task,
+      headerName: 'Assigned To',
+      width: 150,
+      valueGetter: (params) => params.data?.assignedTo || 'Unassigned'
+    },
+    {
+      headerName: 'Actions',
+      cellRenderer: ActionsCellRenderer,
+      width: 80,
+      sortable: false,
+      filter: false,
+      resizable: false
+    }
+  ], []);
+
+  // AG-Grid default column definitions
+  const defaultColDef = useMemo(() => ({
+    resizable: true,
+    sortable: true,
+    filter: false
+  }), []);
+
+  // Row selection configuration
+  const rowSelection = useMemo(() => ({
+    mode: 'multiRow',
+    checkboxes: true,
+    headerCheckbox: true,
+    selectAll: 'filtered'
+  }), []);
+
+  // Selection column definition
+  const selectionColumnDef = useMemo(() => ({
+    width: 50,
+    pinned: 'left',
+    resizable: false,
+    suppressHeaderMenuButton: true
+  }), []);
+
+  // Handle AG-Grid row click
+  const onRowClicked = useCallback((event: any) => {
+    // Only open task details if not clicking on checkbox column
+    if (event.column?.colId !== 'ag-Grid-AutoColumn') {
+      handleTaskClick(event.data);
+    }
+  }, [handleTaskClick]);
+
+  // Handle selection changes in AG-Grid
+  const onSelectionChanged = useCallback((event: any) => {
+    const selectedRows = event.api.getSelectedRows();
+    const selectedIds = new Set(selectedRows.map((row: Task) => row.id));
+    setSelectedTaskIds(selectedIds);
+  }, []);
+
+  // Set AG-Grid theme mode on body
+  useEffect(() => {
+    document.body.dataset.agThemeMode = currentTheme === 'dark' ? 'dark' : 'light';
+  }, [currentTheme]);
+
   return (
-    <ThemeProvider>
-      <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
         {/* Top Header Bar */}
         <div className="bg-[#D71E2B] text-white px-6 py-3 flex items-center justify-between">
           <div>
@@ -386,7 +568,7 @@ const ModernDesktopLayout: React.FC = () => {
           )}
 
           {/* Content Area */}
-          <div className="flex-1 overflow-auto p-6">
+          <div className="flex-1 overflow-hidden p-6 flex flex-col">
             {activeView === 'dashboard' ? (
               /* Dashboard View */
               <div className="space-y-6">
@@ -484,7 +666,7 @@ const ModernDesktopLayout: React.FC = () => {
               </div>
             ) : (
               /* Tasks View */
-              <div>
+              <div className="flex-1 flex flex-col">
                 {viewMode === 'grid' ? (
                   /* Grid View */
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -549,82 +731,26 @@ const ModernDesktopLayout: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  /* List View */
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Task
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Priority
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Due Date
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Assigned To
-                          </th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                        {tasks.map((task) => (
-                          <tr
-                            key={task.id}
-                            className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
-                            onClick={() => handleTaskClick(task)}
-                          >
-                            <td className="px-6 py-4">
-                              <div>
-                                <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                  {task.title}
-                                </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                  {task.controlName}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                                {task.status}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <div className="flex items-center space-x-2">
-                                <div className={`w-2 h-2 rounded-full ${getPriorityColor(task.priority)}`}></div>
-                                <span className="text-sm text-gray-900 dark:text-white capitalize">
-                                  {task.priority}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                              {format(task.dueDate, 'MMM dd, yyyy')}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                              {task.assignedTo || 'Unassigned'}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Handle actions
-                                }}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                              >
-                                <MoreVertical size={16} />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  /* List View with AG-Grid */
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden" style={{ height: '600px', width: '100%' }}>
+                      <AgGridReact
+                        theme={customTheme}
+                        rowData={tasks}
+                        columnDefs={columnDefs}
+                        defaultColDef={defaultColDef}
+                        rowSelection={rowSelection}
+                        selectionColumnDef={selectionColumnDef}
+                        onRowClicked={onRowClicked}
+                        onSelectionChanged={onSelectionChanged}
+                        animateRows={true}
+                        suppressCellFocus={true}
+                        suppressRowHoverHighlight={false}
+                        overlayNoRowsTemplate="No tasks to display"
+                        getRowId={(params) => params.data.id}
+                        onGridReady={(params) => {
+                          params.api.sizeColumnsToFit();
+                        }}
+                      />
                   </div>
                 )}
               </div>
@@ -890,9 +1016,8 @@ const ModernDesktopLayout: React.FC = () => {
             </div>
           </div>
         )}
-        </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 };
 

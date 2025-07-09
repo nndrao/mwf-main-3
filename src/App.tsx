@@ -3,7 +3,7 @@ import HeaderImproved from './components/HeaderImproved';
 import TaskListImproved from './components/TaskListImproved';
 import TaskDetails from './components/TaskDetails';
 import FilterSheet from './components/FilterSheet';
-import ModernDesktopLayout from './components/ModernDesktopLayout';
+import ModernDesktopLayoutWrapper from './components/ModernDesktopLayoutWrapper';
 import TabletLayout from './components/TabletLayout';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useTasks } from './hooks/useTasks';
@@ -43,7 +43,7 @@ function App() {
   }, []);
 
   if (viewMode === 'desktop') {
-    return <ModernDesktopLayout />;
+    return <ModernDesktopLayoutWrapper />;
   }
 
   if (viewMode === 'tablet') {

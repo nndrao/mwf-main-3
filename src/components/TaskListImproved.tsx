@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, FileText, CheckCircle, AlertTriangle, Clock, Filter, Plus, ChevronRight, Briefcase } from 'lucide-react';
+import { Calendar, FileText, CheckCircle, AlertTriangle, Clock, Filter, Plus, ChevronRight, Briefcase, PenTool, Info, MessageSquare, Activity, UserPlus, MoreVertical, Check, Square, CheckSquare } from 'lucide-react';
 import { Task } from '../types';
 import { formatDate, getDateColor } from '../utils/dateUtils';
 import MobileStatusTabs from './MobileStatusTabs';
@@ -20,6 +20,9 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
   onShowFilters
 }) => {
   const [activeStatus, setActiveStatus] = useState('all');
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [showActionSheet, setShowActionSheet] = useState(false);
   const getPriorityColor = (priority: Task['priority']) => {
     switch (priority) {
       case 'critical': return 'bg-red-500';
@@ -92,36 +95,118 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
   const outstandingCount = tasks.filter(t => t.status === 'outstanding').length;
   const completedCount = tasks.filter(t => t.status === 'completed').length;
 
+  // Handle long press to enter selection mode
+  const handleLongPress = (taskId: string) => {
+    console.log('Long press triggered for task:', taskId);
+    if (!isSelectionMode) {
+      setIsSelectionMode(true);
+      setSelectedTaskIds(new Set([taskId]));
+      // Trigger haptic feedback if available
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+    }
+  };
+
+  // Toggle task selection
+  const toggleTaskSelection = (taskId: string) => {
+    const newSelection = new Set(selectedTaskIds);
+    if (newSelection.has(taskId)) {
+      newSelection.delete(taskId);
+    } else {
+      newSelection.add(taskId);
+    }
+    setSelectedTaskIds(newSelection);
+  };
+
+  // Exit selection mode
+  const exitSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedTaskIds(new Set());
+  };
+
+  // Select all tasks
+  const selectAllTasks = () => {
+    const allTaskIds = new Set(filteredTasks.map(task => task.id));
+    setSelectedTaskIds(allTaskIds);
+  };
+
+  // Handle task click
+  const handleTaskClick = (task: Task, event?: React.MouseEvent) => {
+    // If clicking on the chevron or the right part of the card in selection mode, view details
+    if (isSelectionMode && event) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      const cardWidth = rect.width;
+      
+      // If click is in the right 20% of the card or on the chevron, view details
+      if (clickX > cardWidth * 0.8) {
+        onSelectTask(task);
+        return;
+      }
+    }
+    
+    if (isSelectionMode) {
+      toggleTaskSelection(task.id);
+    } else {
+      onSelectTask(task);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Enhanced Mobile Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-5 shadow-sm">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Tasks</h1>
-            <div className="flex items-center space-x-3 mt-1">
-              <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                {outstandingCount} outstanding
-              </span>
-              {outstandingCount > 0 && (
-                <>
-                  <span className="text-gray-300 dark:text-gray-600">•</span>
-                  <span className="text-sm font-medium text-red-600 dark:text-red-400">
+          {isSelectionMode ? (
+            <>
+              <button
+                onClick={exitSelectionMode}
+                className="text-blue-600 dark:text-blue-400 font-medium"
+              >
+                Cancel
+              </button>
+              <div className="text-center">
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {selectedTaskIds.size} Selected
+                </p>
+              </div>
+              <button
+                onClick={selectAllTasks}
+                className="text-blue-600 dark:text-blue-400 font-medium"
+              >
+                Select All
+              </button>
+            </>
+          ) : (
+            <>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Tasks</h1>
+                <div className="flex items-center space-x-3 mt-1">
+                  <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
                     {outstandingCount} outstanding
                   </span>
-                </>
-              )}
-              <span className="text-gray-300 dark:text-gray-600">•</span>
-              <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                {completedCount} completed
-              </span>
-            </div>
-          </div>
-          <button 
-            className="bg-[#D71E2B] text-white p-3 rounded-xl hover:bg-[#B5181F] active:scale-95 transition-all duration-150 shadow-md"
-          >
-            <Plus size={24} />
-          </button>
+                  {outstandingCount > 0 && (
+                    <>
+                      <span className="text-gray-300 dark:text-gray-600">•</span>
+                      <span className="text-sm font-medium text-red-600 dark:text-red-400">
+                        {outstandingCount} outstanding
+                      </span>
+                    </>
+                  )}
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
+                  <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                    {completedCount} completed
+                  </span>
+                </div>
+              </div>
+              <button 
+                className="bg-[#D71E2B] text-white p-3 rounded-xl hover:bg-[#B5181F] active:scale-95 transition-all duration-150 shadow-md"
+              >
+                <Plus size={24} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -135,22 +220,63 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
       {/* Task List with improved mobile UI */}
       <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
         <div className="px-4 py-4 space-y-4">
-          {filteredTasks.map(task => (
-            <div
-              key={task.id}
-              onClick={() => onSelectTask(task)}
-              className={`
+          {filteredTasks.map(task => {
+            const isSelected = selectedTaskIds.has(task.id);
+            let longPressTimer: NodeJS.Timeout;
+            
+            return (
+              <div
+                key={task.id}
+                onClick={(e) => handleTaskClick(task, e)}
+                onTouchStart={() => {
+                  console.log('Touch start on task:', task.id);
+                  longPressTimer = setTimeout(() => handleLongPress(task.id), 500);
+                }}
+                onTouchEnd={() => {
+                  console.log('Touch end on task:', task.id);
+                  clearTimeout(longPressTimer);
+                }}
+                onTouchMove={() => {
+                  console.log('Touch move on task:', task.id);
+                  clearTimeout(longPressTimer);
+                }}
+                onMouseDown={() => {
+                  console.log('Mouse down on task:', task.id);
+                  longPressTimer = setTimeout(() => handleLongPress(task.id), 500);
+                }}
+                onMouseUp={() => {
+                  console.log('Mouse up on task:', task.id);
+                  clearTimeout(longPressTimer);
+                }}
+                onMouseLeave={() => {
+                  console.log('Mouse leave on task:', task.id);
+                  clearTimeout(longPressTimer);
+                }}
+                className={`relative
                 bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg 
                 border-2 transition-all duration-200 cursor-pointer
                 active:scale-[0.99] overflow-hidden
-                ${selectedTask?.id === task.id 
-                  ? 'border-blue-500 dark:border-blue-400' 
-                  : 'border-transparent'
+                ${isSelected && isSelectionMode
+                  ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20' 
+                  : selectedTask?.id === task.id 
+                    ? 'border-blue-500 dark:border-blue-400' 
+                    : 'border-transparent'
                 }
               `}
-            >
-              {/* Task Card Content */}
-              <div className="p-4">
+              >
+                {/* Selection Checkbox */}
+                {isSelectionMode && (
+                  <div className="absolute left-4 top-4 z-10">
+                    {isSelected ? (
+                      <CheckSquare size={24} className="text-blue-500" />
+                    ) : (
+                      <Square size={24} className="text-gray-400 dark:text-gray-500" />
+                    )}
+                  </div>
+                )}
+                
+                {/* Task Card Content */}
+                <div className={`p-4 ${isSelectionMode ? 'pl-14' : ''}`}>
                 {/* Top Section with Status Icon and Actions */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
@@ -236,12 +362,20 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
                   <div className="flex items-center justify-between">
                     <span className={`inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-bold border ${getStatusColor(task.status)}`}>
                       {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                      {task.daysOverdue && task.daysOverdue > 0 && (
+                      {!!task.daysOverdue && task.daysOverdue > 0 ? (
                         <span className="ml-2">({task.daysOverdue}d)</span>
-                      )}
+                      ) : null}
                     </span>
                     
-                    <ChevronRight size={20} className="text-gray-400" />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectTask(task);
+                      }}
+                      className="p-2 -m-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronRight size={20} className="text-gray-400" />
+                    </button>
                   </div>
                 </div>
 
@@ -258,7 +392,8 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Empty State */}
@@ -286,6 +421,135 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
           <span>Filters & Search</span>
         </button>
       </div>
+
+      {/* Floating Action Button for Selected Items */}
+      {isSelectionMode && selectedTaskIds.size > 0 && (
+        <div className="absolute bottom-24 right-4 z-20">
+          <button
+            onClick={() => setShowActionSheet(true)}
+            className="bg-[#D71E2B] text-white p-4 rounded-full shadow-lg hover:bg-[#B5181F] active:scale-95 transition-all duration-150"
+          >
+            <MoreVertical size={24} />
+          </button>
+        </div>
+      )}
+
+      {/* Action Sheet for Selected Items */}
+      {showActionSheet && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-50 transition-opacity duration-300"
+            onClick={() => setShowActionSheet(false)}
+          />
+          
+          {/* Action Sheet */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom duration-300">
+            <div className="bg-white dark:bg-gray-900 rounded-t-3xl shadow-2xl safe-area-bottom">
+              {/* Drag Handle */}
+              <div className="flex justify-center pt-3 pb-2">
+                <div className="w-12 h-1 bg-gray-300 dark:bg-gray-700 rounded-full" />
+              </div>
+              
+              {/* Action Title */}
+              <div className="px-6 pb-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white text-center">
+                  {selectedTaskIds.size} Task{selectedTaskIds.size > 1 ? 's' : ''} Selected
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">
+                  Choose an action to perform
+                </p>
+              </div>
+              
+              {/* Actions */}
+              <div className="px-4 pb-2">
+                <div className="space-y-2">
+                  <button
+                    onClick={() => {
+                      console.log('Initiate Sign Off for:', Array.from(selectedTaskIds));
+                      setShowActionSheet(false);
+                      exitSelectionMode();
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors active:scale-[0.98]"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                      <PenTool size={20} className="text-gray-600 dark:text-gray-400" />
+                    </div>
+                    <span className="text-base font-medium text-gray-900 dark:text-white flex-1 text-left">Initiate Sign Off</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      console.log('Request Info for:', Array.from(selectedTaskIds));
+                      setShowActionSheet(false);
+                      exitSelectionMode();
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors active:scale-[0.98]"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                      <Info size={20} className="text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <span className="text-base font-medium text-gray-900 dark:text-white flex-1 text-left">Request Info</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      console.log('Add Notes for:', Array.from(selectedTaskIds));
+                      setShowActionSheet(false);
+                      exitSelectionMode();
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors active:scale-[0.98]"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                      <MessageSquare size={20} className="text-green-600 dark:text-green-400" />
+                    </div>
+                    <span className="text-base font-medium text-gray-900 dark:text-white flex-1 text-left">Add Notes</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      console.log('View Activity for:', Array.from(selectedTaskIds));
+                      setShowActionSheet(false);
+                      exitSelectionMode();
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors active:scale-[0.98]"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                      <Activity size={20} className="text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <span className="text-base font-medium text-gray-900 dark:text-white flex-1 text-left">View Activity</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      console.log('Delegate:', Array.from(selectedTaskIds));
+                      setShowActionSheet(false);
+                      exitSelectionMode();
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors active:scale-[0.98]"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                      <UserPlus size={20} className="text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <span className="text-base font-medium text-gray-900 dark:text-white flex-1 text-left">Delegate</span>
+                  </button>
+                </div>
+                
+                {/* Cancel Button */}
+                <button
+                  onClick={() => setShowActionSheet(false)}
+                  className="w-full mt-3 py-3.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-2xl active:scale-[0.98] transition-transform"
+                >
+                  Cancel
+                </button>
+              </div>
+              
+              {/* Bottom Safe Area Padding */}
+              <div className="h-2" />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
