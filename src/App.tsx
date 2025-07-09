@@ -4,11 +4,12 @@ import TaskListImproved from './components/TaskListImproved';
 import TaskDetails from './components/TaskDetails';
 import FilterSheet from './components/FilterSheet';
 import ModernDesktopLayout from './components/ModernDesktopLayout';
+import TabletLayout from './components/TabletLayout';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useTasks } from './hooks/useTasks';
 
 function App() {
-  const [viewMode, setViewMode] = useState<'mobile' | 'enterprise'>('mobile');
+  const [viewMode, setViewMode] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
   const [showFilters, setShowFilters] = useState(false);
   const {
     tasks,
@@ -23,10 +24,17 @@ function App() {
     deleteTask
   } = useTasks();
 
-  // Check if we should show enterprise view (larger screens)
+  // Responsive breakpoints for different view modes
   React.useEffect(() => {
     const checkViewMode = () => {
-      setViewMode(window.innerWidth >= 1024 ? 'enterprise' : 'mobile');
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setViewMode('desktop');
+      } else if (width >= 768) {
+        setViewMode('tablet');
+      } else {
+        setViewMode('mobile');
+      }
     };
     
     checkViewMode();
@@ -34,8 +42,16 @@ function App() {
     return () => window.removeEventListener('resize', checkViewMode);
   }, []);
 
-  if (viewMode === 'enterprise') {
+  if (viewMode === 'desktop') {
     return <ModernDesktopLayout />;
+  }
+
+  if (viewMode === 'tablet') {
+    return (
+      <ThemeProvider>
+        <TabletLayout />
+      </ThemeProvider>
+    );
   }
 
   return (

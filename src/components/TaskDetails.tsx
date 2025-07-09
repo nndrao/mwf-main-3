@@ -20,9 +20,10 @@ interface TaskDetailsProps {
   task: Task;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => void;
   onClose: () => void;
+  isTabletView?: boolean;
 }
 
-const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onUpdateTask, onClose }) => {
+const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onUpdateTask, onClose, isTabletView = false }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<Partial<Task>>({});
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);

@@ -37,6 +37,8 @@ const ModernDesktopLayout: React.FC = () => {
   const [showTaskDetails, setShowTaskDetails] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTask, setEditedTask] = useState<Partial<Task>>({});
   
   const {
     tasks: allTasks,
@@ -104,6 +106,34 @@ const ModernDesktopLayout: React.FC = () => {
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
     setShowTaskDetails(true);
+    setIsEditing(false);
+    setEditedTask({});
+  };
+
+  const handleStartEdit = () => {
+    if (selectedTask) {
+      setIsEditing(true);
+      setEditedTask({
+        title: selectedTask.title,
+        description: selectedTask.description,
+        priority: selectedTask.priority,
+        dueDate: selectedTask.dueDate,
+        assignedTo: selectedTask.assignedTo
+      });
+    }
+  };
+
+  const handleSaveEdit = () => {
+    if (selectedTask && editedTask) {
+      updateTask(selectedTask.id, editedTask);
+      setIsEditing(false);
+      setEditedTask({});
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedTask({});
   };
 
   const getStatusColor = (status: Task['status']) => {
@@ -568,21 +598,64 @@ const ModernDesktopLayout: React.FC = () => {
                     {/* Task Info */}
                     <div>
                       <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                            {selectedTask.title}
-                          </h3>
-                          <p className="text-gray-600 dark:text-gray-400">
-                            {selectedTask.description}
-                          </p>
+                        <div className="flex-1">
+                          {!isEditing ? (
+                            <>
+                              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                                {selectedTask.title}
+                              </h3>
+                              <p className="text-gray-600 dark:text-gray-400">
+                                {selectedTask.description}
+                              </p>
+                            </>
+                          ) : (
+                            <div className="space-y-3">
+                              <input
+                                type="text"
+                                value={editedTask.title || ''}
+                                onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                                className="w-full px-3 py-2 text-lg font-semibold bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                                placeholder="Task title"
+                              />
+                              <textarea
+                                value={editedTask.description || ''}
+                                onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+                                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white resize-none"
+                                rows={3}
+                                placeholder="Task description"
+                              />
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                            <Edit3 size={18} className="text-gray-500 dark:text-gray-400" />
-                          </button>
-                          <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
-                            <Trash2 size={18} className="text-gray-500 dark:text-gray-400" />
-                          </button>
+                          {!isEditing ? (
+                            <>
+                              <button 
+                                onClick={handleStartEdit}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+                              >
+                                <Edit3 size={18} className="text-gray-500 dark:text-gray-400" />
+                              </button>
+                              <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200">
+                                <Trash2 size={18} className="text-gray-500 dark:text-gray-400" />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={handleSaveEdit}
+                                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -596,24 +669,56 @@ const ModernDesktopLayout: React.FC = () => {
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Priority</p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <div className={`w-3 h-3 rounded-full ${getPriorityColor(selectedTask.priority)}`}></div>
-                            <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
-                              {selectedTask.priority}
-                            </span>
-                          </div>
+                          {!isEditing ? (
+                            <div className="flex items-center space-x-2 mt-1">
+                              <div className={`w-3 h-3 rounded-full ${getPriorityColor(selectedTask.priority)}`}></div>
+                              <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                                {selectedTask.priority}
+                              </span>
+                            </div>
+                          ) : (
+                            <select
+                              value={editedTask.priority || selectedTask.priority}
+                              onChange={(e) => setEditedTask({ ...editedTask, priority: e.target.value as Task['priority'] })}
+                              className="mt-1 w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                            >
+                              <option value="low">Low</option>
+                              <option value="medium">Medium</option>
+                              <option value="high">High</option>
+                              <option value="critical">Critical</option>
+                            </select>
+                          )}
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Due Date</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {format(selectedTask.dueDate, 'MMMM dd, yyyy')}
-                          </p>
+                          {!isEditing ? (
+                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                              {format(selectedTask.dueDate, 'MMMM dd, yyyy')}
+                            </p>
+                          ) : (
+                            <input
+                              type="datetime-local"
+                              value={editedTask.dueDate ? new Date(editedTask.dueDate).toISOString().slice(0, 16) : new Date(selectedTask.dueDate).toISOString().slice(0, 16)}
+                              onChange={(e) => setEditedTask({ ...editedTask, dueDate: new Date(e.target.value) })}
+                              className="mt-1 w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                            />
+                          )}
                         </div>
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Assigned To</p>
-                          <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {selectedTask.assignedTo || 'Unassigned'}
-                          </p>
+                          {!isEditing ? (
+                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                              {selectedTask.assignedTo || 'Unassigned'}
+                            </p>
+                          ) : (
+                            <input
+                              type="text"
+                              value={editedTask.assignedTo || selectedTask.assignedTo || ''}
+                              onChange={(e) => setEditedTask({ ...editedTask, assignedTo: e.target.value })}
+                              className="mt-1 w-full px-2 py-1 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
+                              placeholder="Enter assignee name"
+                            />
+                          )}
                         </div>
                       </div>
                     </div>
