@@ -62,7 +62,7 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onUpdateTask, onClose, 
   const getStatusIcon = (status: Task['status']) => {
     switch (status) {
       case 'completed': return <CheckCircle size={24} className="text-green-500" />;
-      case 'overdue': return <AlertTriangle size={24} className="text-red-500" />;
+      case 'outstanding': return <AlertTriangle size={24} className="text-red-500" />;
       default: return <Clock size={24} className="text-orange-500" />;
     }
   };

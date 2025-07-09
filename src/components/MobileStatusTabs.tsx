@@ -12,7 +12,7 @@ const MobileStatusTabs: React.FC<MobileStatusTabsProps> = ({ tasks, activeStatus
   const getCount = (status: string) => {
     switch (status) {
       case 'outstanding':
-        return tasks.filter(t => t.status === 'overdue').length;
+        return tasks.filter(t => t.status === 'outstanding').length;
       case 'today':
         const today = new Date();
         return tasks.filter(t => {

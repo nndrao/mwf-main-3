@@ -43,7 +43,7 @@ const TabletLayout: React.FC = () => {
     // Status filter
     switch (activeStatus) {
       case 'outstanding':
-        return task.status === 'overdue';
+        return task.status === 'outstanding';
       case 'today':
         const today = new Date();
         const taskDate = new Date(task.dueDate);
@@ -63,7 +63,7 @@ const TabletLayout: React.FC = () => {
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
       case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-      case 'overdue': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+      case 'outstanding': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
       default: return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
     }
   };
@@ -201,7 +201,7 @@ const TabletLayout: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                      {task.status === 'overdue' ? 'outstanding' : task.status}
+                      {task.status}
                     </span>
                     <div className="flex items-center space-x-1.5">
                       <div className={`w-2 h-2 rounded-full ${getPriorityColor(task.priority)}`} />

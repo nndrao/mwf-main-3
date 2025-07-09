@@ -2,7 +2,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'outstanding' | 'completed' | 'overdue';
+  status: 'outstanding' | 'completed';
   priority: 'low' | 'medium' | 'high' | 'critical';
   dueDate: Date;
   createdDate: Date;

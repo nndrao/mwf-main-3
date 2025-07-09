@@ -19,7 +19,6 @@ const FilterSheet: React.FC<FilterSheetProps> = ({
     all: tasks.length,
     outstanding: tasks.filter(t => t.status === 'outstanding').length,
     completed: tasks.filter(t => t.status === 'completed').length,
-    overdue: tasks.filter(t => t.status === 'overdue').length,
   };
 
   const teamViewOptions = [

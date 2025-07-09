@@ -69,7 +69,7 @@ const ModernDesktopLayout: React.FC = () => {
 
     switch (selectedFilter) {
       case 'outstanding':
-        return task.status === 'overdue';
+        return task.status === 'outstanding';
       case 'today':
         const today = new Date();
         const taskDate = new Date(task.dueDate);
@@ -88,7 +88,7 @@ const ModernDesktopLayout: React.FC = () => {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, count: null },
     { id: 'all', label: 'All Tasks', icon: FileText, count: allTasks.length },
-    { id: 'outstanding', label: 'Outstanding', icon: AlertTriangle, count: allTasks.filter(t => t.status === 'overdue').length, color: 'text-red-500' },
+    { id: 'outstanding', label: 'Outstanding', icon: AlertTriangle, count: allTasks.filter(t => t.status === 'outstanding').length, color: 'text-red-500' },
     { id: 'today', label: 'Due Today', icon: Clock, count: allTasks.filter(t => {
       const today = new Date();
       const taskDate = new Date(t.dueDate);
@@ -145,7 +145,7 @@ const ModernDesktopLayout: React.FC = () => {
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
       case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'overdue': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+      case 'outstanding': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       default: return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
     }
   };
@@ -411,7 +411,7 @@ const ModernDesktopLayout: React.FC = () => {
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">Outstanding</p>
                         <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
-                          {allTasks.filter(t => t.status === 'overdue').length}
+                          {allTasks.filter(t => t.status === 'outstanding').length}
                         </p>
                       </div>
                       <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
@@ -472,7 +472,7 @@ const ModernDesktopLayout: React.FC = () => {
                           </div>
                           <div className="flex items-center space-x-3">
                             <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                              {task.status === 'overdue' ? 'outstanding' : task.status}
+                              {task.status}
                             </span>
                             <ChevronRight className="text-gray-400" size={20} />
                           </div>
@@ -593,7 +593,7 @@ const ModernDesktopLayout: React.FC = () => {
                             </td>
                             <td className="px-6 py-4">
                               <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                                {task.status === 'overdue' ? 'outstanding' : task.status}
+                                {task.status}
                               </span>
                             </td>
                             <td className="px-6 py-4">
@@ -720,7 +720,7 @@ const ModernDesktopLayout: React.FC = () => {
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                           <span className={`inline-flex px-2.5 py-1 text-sm font-medium rounded-full mt-1 ${getStatusColor(selectedTask.status)}`}>
-                            {selectedTask.status === 'overdue' ? 'outstanding' : selectedTask.status}
+                            {selectedTask.status}
                           </span>
                         </div>
                         <div>

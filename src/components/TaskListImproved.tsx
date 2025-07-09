@@ -43,7 +43,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
   const getStatusIcon = (status: Task['status']) => {
     switch (status) {
       case 'completed': return <CheckCircle size={20} className="text-green-500" />;
-      case 'overdue': return <AlertTriangle size={20} className="text-red-500" />;
+      case 'outstanding': return <AlertTriangle size={20} className="text-red-500" />;
       default: return <Clock size={20} className="text-orange-500" />;
     }
   };
@@ -51,7 +51,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
   const getStatusColor = (status: Task['status']) => {
     switch (status) {
       case 'completed': return 'text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-900/30 border-green-200 dark:border-green-800';
-      case 'overdue': return 'text-red-700 bg-red-50 dark:text-red-300 dark:bg-red-900/30 border-red-200 dark:border-red-800';
+      case 'outstanding': return 'text-red-700 bg-red-50 dark:text-red-300 dark:bg-red-900/30 border-red-200 dark:border-red-800';
       default: return 'text-orange-700 bg-orange-50 dark:text-orange-300 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800';
     }
   };
@@ -72,7 +72,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
   const filteredTasks = tasks.filter(task => {
     switch (activeStatus) {
       case 'outstanding':
-        return task.status === 'overdue';
+        return task.status === 'outstanding';
       case 'today':
         const today = new Date();
         const taskDate = new Date(task.dueDate);
@@ -91,7 +91,6 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
 
   const outstandingCount = tasks.filter(t => t.status === 'outstanding').length;
   const completedCount = tasks.filter(t => t.status === 'completed').length;
-  const overdueCount = tasks.filter(t => t.status === 'overdue').length;
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900 overflow-hidden">
@@ -104,11 +103,11 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
               <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
                 {outstandingCount} outstanding
               </span>
-              {overdueCount > 0 && (
+              {outstandingCount > 0 && (
                 <>
                   <span className="text-gray-300 dark:text-gray-600">•</span>
                   <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                    {overdueCount} outstanding
+                    {outstandingCount} outstanding
                   </span>
                 </>
               )}
@@ -236,7 +235,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
                   {/* Status Badge */}
                   <div className="flex items-center justify-between">
                     <span className={`inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-bold border ${getStatusColor(task.status)}`}>
-                      {task.status === 'overdue' ? 'Outstanding' : task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                      {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
                       {task.daysOverdue && task.daysOverdue > 0 && (
                         <span className="ml-2">({task.daysOverdue}d)</span>
                       )}

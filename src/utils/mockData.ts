@@ -82,18 +82,16 @@ export const generateMockTasks = (): Task[] => {
     const subcategoryList = subcategories[category as keyof typeof subcategories];
     const subcategory = subcategoryList ? subcategoryList[Math.floor(Math.random() * subcategoryList.length)] : undefined;
     
-    const isOverdue = Math.random() < 0.15;
     const isCompleted = Math.random() < 0.25;
     
     let status: Task['status'] = 'outstanding';
     if (isCompleted) status = 'completed';
-    else if (isOverdue) status = 'overdue';
 
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + Math.floor(Math.random() * 60) - 30);
 
     const createdDate = new Date(dueDate.getTime() - Math.random() * 86400000 * 14);
-    const daysOverdue = isOverdue ? Math.floor(Math.random() * 10) + 1 : 0;
+    const daysOverdue = status === 'outstanding' && dueDate < new Date() ? Math.floor((new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
     const task: Task = {
       id: (167175 + i).toString(),
