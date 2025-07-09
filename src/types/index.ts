@@ -20,6 +20,7 @@ export interface Task {
   daysOverdue?: number;
   subcategory?: string;
   teamView?: 'user' | 'pending' | 'watcher' | 'rfi' | 'teams' | 'extended';
+  additionalInfo?: AdditionalInfo;
 }
 
 export interface TaskFile {
@@ -76,11 +77,35 @@ export interface TaskStats {
 export interface ControlInstruction {
   title: string;
   content: string;
-  additionalInfo: string;
+  controlNote: string;
   sections: InstructionSection[];
 }
 
 export interface InstructionSection {
   title: string;
   items: string[];
+}
+
+export interface AdditionalInfo {
+  title: string;
+  data: AdditionalInfoRow[];
+  totals?: AdditionalInfoTotals;
+}
+
+export interface AdditionalInfoRow {
+  id: string;
+  applicationName: string;
+  envName?: string;
+  envId?: string;
+  bankAcct: string;
+  totalValue: number;
+  expectedValue: number;
+  variance?: number;
+  status?: 'success' | 'warning' | 'error';
+}
+
+export interface AdditionalInfoTotals {
+  totalValue: number;
+  expectedValue: number;
+  variance?: number;
 }

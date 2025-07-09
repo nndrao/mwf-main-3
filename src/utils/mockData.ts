@@ -1,4 +1,4 @@
-import { Task, TaskCategory } from '../types';
+import { Task, TaskCategory, AdditionalInfoRow } from '../types';
 
 export const generateMockTasks = (): Task[] => {
   const categories = [
@@ -146,6 +146,49 @@ export const generateMockTasks = (): Task[] => {
         type: 'application/vnd.ms-excel.sheet.macroEnabled.12',
         url: '#'
       });
+    }
+
+    // Add additional info to some tasks (30% chance)
+    if (Math.random() < 0.3 && (category.includes('PnL') || category.includes('Trading'))) {
+      const numRows = Math.floor(Math.random() * 4) + 2; // 2-5 rows
+      const rows = [];
+      let totalValue = 0;
+      let expectedValue = 0;
+
+      for (let j = 0; j < numRows; j++) {
+        const appNames = ['NAM-P&L-RISK-01', 'EUR-DERIV-02', 'APAC-EQU-03', 'LATAM-FX-01', 'GLOBAL-RATES-05'];
+        const envNames = ['Production', 'UAT', 'QA', 'Staging'];
+        const bankAccts = ['JPM-NYSE-0156', 'BAML-LDN-2341', 'GS-TOKYO-8923', 'MS-SYDNEY-4567', 'CITI-NY-7890'];
+        
+        const rowTotalValue = Math.floor(Math.random() * 10000000) + 100000;
+        const rowExpectedValue = rowTotalValue + (Math.random() < 0.5 ? -Math.floor(Math.random() * 50000) : Math.floor(Math.random() * 50000));
+        const variance = rowTotalValue - rowExpectedValue;
+        
+        totalValue += rowTotalValue;
+        expectedValue += rowExpectedValue;
+
+        rows.push({
+          id: `row-${j}`,
+          applicationName: appNames[Math.floor(Math.random() * appNames.length)],
+          envName: envNames[Math.floor(Math.random() * envNames.length)],
+          envId: `ENV${Math.floor(Math.random() * 9000) + 1000}`,
+          bankAcct: bankAccts[Math.floor(Math.random() * bankAccts.length)],
+          totalValue: rowTotalValue,
+          expectedValue: rowExpectedValue,
+          variance: variance,
+          status: (Math.abs(variance) > 100000 ? 'error' : Math.abs(variance) > 50000 ? 'warning' : 'success') as 'success' | 'warning' | 'error'
+        } as AdditionalInfoRow);
+      }
+
+      task.additionalInfo = {
+        title: 'Additional Details',
+        data: rows,
+        totals: {
+          totalValue,
+          expectedValue,
+          variance: totalValue - expectedValue
+        }
+      };
     }
 
     mockTasks.push(task);

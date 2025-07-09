@@ -187,7 +187,11 @@ const TabletLayout: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2">
+                    <h3 className={`font-semibold line-clamp-2 ${
+                      task.additionalInfo 
+                        ? 'text-blue-600 dark:text-blue-400' 
+                        : 'text-gray-900 dark:text-white'
+                    }`}>
                       {task.title}
                     </h3>
                   </div>

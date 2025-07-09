@@ -15,21 +15,24 @@ const WellsFargoControlInstructions: React.FC<WellsFargoControlInstructionsProps
         return {
           title: 'Finance / Product Control:',
           content: `This control enables delivery of desk level T+1 Final PnL by Finance Product Controllers for review and approval by each Desk. Below provides instructions for both Finance Product Controllers as well as for individuals responsible to review T+3 CLEAN PnL for each desk.`,
-          forBusinessSignOff: 'Finance / Product Controls'
+          forBusinessSignOff: 'Finance / Product Controls',
+          controlNote: 'Standard PnL reconciliation workflow applies. All variances above threshold require documentation.'
         };
       
       case 'Trade Surveillance Alert':
         return {
           title: 'Trade Surveillance Review:',
           content: `This control requires investigation of flagged trading activity that may indicate potential market manipulation, operational errors, or compliance violations. All alerts must be reviewed within 24 hours of generation.`,
-          forBusinessSignOff: 'Compliance Team'
+          forBusinessSignOff: 'Compliance Team',
+          controlNote: 'Alert requires immediate attention. Document all investigation steps and findings.'
         };
 
       default:
         return {
           title: 'Control Instructions:',
           content: task.description || 'Standard control workflow applies. Follow established procedures for review and approval.',
-          forBusinessSignOff: 'Business Unit'
+          forBusinessSignOff: 'Business Unit',
+          controlNote: 'Follow standard operating procedures for this control type.'
         };
     }
   };
@@ -84,7 +87,7 @@ const WellsFargoControlInstructions: React.FC<WellsFargoControlInstructionsProps
           <div className="bg-blue-900/30 border border-blue-700 p-3 rounded">
             <h4 className="text-xs font-bold text-blue-300 mb-2">Additional Information</h4>
             <p className="text-xs text-gray-300">
-              No payload.
+              {instructions.controlNote}
             </p>
           </div>
         </div>

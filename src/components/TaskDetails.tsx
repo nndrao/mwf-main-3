@@ -15,6 +15,7 @@ import { Task } from '../types';
 import { formatDate, getDateColor } from '../utils/dateUtils';
 import MobileDatePicker from './MobileDatePicker';
 import ControlInstructions from './ControlInstructions';
+import AdditionalInfoTable from './AdditionalInfoTable';
 
 interface TaskDetailsProps {
   task: Task;
@@ -266,6 +267,14 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({ task, onUpdateTask, onClose, 
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <ControlInstructions task={task} />
         </div>
+
+        {/* Additional Information */}
+        {task.additionalInfo && (
+          <AdditionalInfoTable 
+            additionalInfo={task.additionalInfo} 
+            isTabletView={isTabletView}
+          />
+        )}
 
         {/* Files */}
         {task.files.length > 0 && (

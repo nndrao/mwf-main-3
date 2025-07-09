@@ -47,7 +47,11 @@ export const PriorityCellRenderer: React.FC<{ value: Task['priority'] }> = ({ va
 export const TaskCellRenderer: React.FC<{ data: Task }> = ({ data }) => {
   return (
     <div className="py-2">
-      <div className="text-sm font-medium text-gray-900 dark:text-white">
+      <div className={`text-sm font-medium ${
+        data.additionalInfo 
+          ? 'text-blue-600 dark:text-blue-400' 
+          : 'text-gray-900 dark:text-white'
+      }`}>
         {data.title}
       </div>
       <div className="text-sm text-gray-500 dark:text-gray-400">

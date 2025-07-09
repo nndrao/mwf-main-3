@@ -15,7 +15,7 @@ const ControlInstructions: React.FC<ControlInstructionsProps> = ({ task }) => {
         return {
           title: 'Finance / Product Control:',
           content: `This control enables delivery of desk level T+1 Final PnL by Finance Product Controllers for review and acknowledgement by each trading desk. The process ensures accurate position valuation, risk assessment, and compliance with regulatory reporting requirements.`,
-          additionalInfo: 'Standard PnL reconciliation workflow applies. All variances above threshold require documentation.',
+          controlNote: 'Standard PnL reconciliation workflow applies. All variances above threshold require documentation.',
           sections: [
             {
               title: 'Finance Product Control Process',
@@ -44,7 +44,7 @@ const ControlInstructions: React.FC<ControlInstructionsProps> = ({ task }) => {
         return {
           title: 'Trade Surveillance Review:',
           content: `This control requires investigation of flagged trading activity that may indicate potential market manipulation, operational errors, or compliance violations. All alerts must be reviewed within 24 hours of generation.`,
-          additionalInfo: 'Alert requires immediate attention. Document all investigation steps and findings.',
+          controlNote: 'Alert requires immediate attention. Document all investigation steps and findings.',
           sections: [
             {
               title: 'Investigation Procedures',
@@ -72,7 +72,7 @@ const ControlInstructions: React.FC<ControlInstructionsProps> = ({ task }) => {
         return {
           title: 'Licensing Compliance Review:',
           content: `This control ensures all trading and sales personnel maintain current regulatory licenses and registrations required for their roles. Regular verification prevents compliance violations and regulatory penalties.`,
-          additionalInfo: 'All licensing requirements must be current. Expired licenses require immediate action.',
+          controlNote: 'All licensing requirements must be current. Expired licenses require immediate action.',
           sections: [
             {
               title: 'Verification Process',
@@ -90,7 +90,7 @@ const ControlInstructions: React.FC<ControlInstructionsProps> = ({ task }) => {
         return {
           title: 'Price Verification Control:',
           content: `Independent validation of pricing for complex financial instruments to ensure accurate valuation and risk measurement. This control is critical for regulatory compliance and internal risk management.`,
-          additionalInfo: 'Price verification must be completed by independent source.',
+          controlNote: 'Price verification must be completed by independent source.',
           sections: [
             {
               title: 'Verification Steps',
@@ -108,7 +108,7 @@ const ControlInstructions: React.FC<ControlInstructionsProps> = ({ task }) => {
         return {
           title: 'Control Instructions:',
           content: task.description,
-          additionalInfo: 'Standard control workflow applies. Follow established procedures.',
+          controlNote: 'Standard control workflow applies. Follow established procedures.',
           sections: [
             {
               title: 'General Requirements',
@@ -175,10 +175,10 @@ const ControlInstructions: React.FC<ControlInstructionsProps> = ({ task }) => {
               </div>
             ))}
 
-            {/* Additional Information */}
+            {/* Control Note */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4 rounded-lg">
-              <h5 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Additional Information</h5>
-              <p className="text-blue-800 dark:text-blue-300">{instructions.additionalInfo}</p>
+              <h5 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Control Note</h5>
+              <p className="text-blue-800 dark:text-blue-300">{instructions.controlNote}</p>
             </div>
 
             {/* Control Metadata */}

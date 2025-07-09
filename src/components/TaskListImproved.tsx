@@ -3,6 +3,7 @@ import { Calendar, FileText, CheckCircle, AlertTriangle, Clock, Filter, Plus, Ch
 import { Task } from '../types';
 import { formatDate, getDateColor } from '../utils/dateUtils';
 import MobileStatusTabs from './MobileStatusTabs';
+import SignoffDialog from './SignoffDialog';
 
 interface TaskListImprovedProps {
   tasks: Task[];
@@ -23,6 +24,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
   const [showActionSheet, setShowActionSheet] = useState(false);
+  const [showSignoffDialog, setShowSignoffDialog] = useState(false);
   const getPriorityColor = (priority: Task['priority']) => {
     switch (priority) {
       case 'critical': return 'bg-red-500';
@@ -186,14 +188,6 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
                   <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
                     {outstandingCount} outstanding
                   </span>
-                  {outstandingCount > 0 && (
-                    <>
-                      <span className="text-gray-300 dark:text-gray-600">•</span>
-                      <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                        {outstandingCount} outstanding
-                      </span>
-                    </>
-                  )}
                   <span className="text-gray-300 dark:text-gray-600">•</span>
                   <span className="text-sm font-medium text-green-600 dark:text-green-400">
                     {completedCount} completed
@@ -315,7 +309,11 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
                 
                 {/* Task Title and Description */}
                 <div className="mb-4">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight mb-2">
+                  <h3 className={`text-lg font-bold leading-tight mb-2 ${
+                    task.additionalInfo 
+                      ? 'text-blue-600 dark:text-blue-400' 
+                      : 'text-gray-900 dark:text-white'
+                  }`}>
                     {task.title}
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
@@ -408,16 +406,16 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
         )}
 
         {/* Add padding at bottom for safe area */}
-        <div className="h-20"></div>
+        <div className="h-16"></div>
       </div>
 
       {/* Enhanced Bottom Action Bar */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 safe-area-bottom shadow-2xl">
+      <div className="absolute bottom-0 left-0 right-0 p-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 safe-area-bottom shadow-lg">
         <button
           onClick={onShowFilters}
-          className="w-full bg-[#D71E2B] hover:bg-[#B5181F] text-white py-4 px-6 rounded-2xl text-base font-bold transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg active:scale-[0.98]"
+          className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2 active:scale-[0.98]"
         >
-          <Filter size={22} />
+          <Filter size={18} />
           <span>Filters & Search</span>
         </button>
       </div>
@@ -466,9 +464,8 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
                 <div className="space-y-2">
                   <button
                     onClick={() => {
-                      console.log('Initiate Sign Off for:', Array.from(selectedTaskIds));
                       setShowActionSheet(false);
-                      exitSelectionMode();
+                      setShowSignoffDialog(true);
                     }}
                     className="w-full flex items-center space-x-3 px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-2xl transition-colors active:scale-[0.98]"
                   >
@@ -550,6 +547,22 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
           </div>
         </>
       )}
+      
+      {/* Signoff Dialog */}
+      <SignoffDialog
+        isOpen={showSignoffDialog}
+        onClose={() => {
+          setShowSignoffDialog(false);
+          exitSelectionMode();
+        }}
+        selectedTasks={tasks.filter(task => selectedTaskIds.has(task.id))}
+        onSubmit={(data) => {
+          console.log('Signoff submitted:', data);
+          // Here you would typically make an API call to submit the signoff
+          setShowSignoffDialog(false);
+          exitSelectionMode();
+        }}
+      />
     </div>
   );
 };

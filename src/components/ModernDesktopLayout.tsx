@@ -34,6 +34,8 @@ import { useTasks } from '../hooks/useTasks';
 import { format } from 'date-fns';
 import ThemeToggle from './ThemeToggle';
 import ControlInstructions from './ControlInstructions';
+import AdditionalInfoTable from './AdditionalInfoTable';
+import SignoffDialog from './SignoffDialog';
 import { AgGridReact } from 'ag-grid-react';
 import { ColDef, ModuleRegistry, themeQuartz, AllCommunityModule } from 'ag-grid-community';
 import { 
@@ -137,6 +139,7 @@ const ModernDesktopLayout: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState<Partial<Task>>({});
   const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
+  const [showSignoffDialog, setShowSignoffDialog] = useState(false);
   const { theme: currentTheme } = useTheme();
   
   const {
@@ -523,6 +526,7 @@ const ModernDesktopLayout: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <button 
                     disabled={selectedTaskIds.size === 0}
+                    onClick={() => setShowSignoffDialog(true)}
                     className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:border-gray-300 dark:disabled:hover:bg-transparent dark:disabled:hover:border-gray-600">
                     <PenTool size={16} className="text-gray-500" />
                     <span>Initiate Sign Off</span>
@@ -666,10 +670,11 @@ const ModernDesktopLayout: React.FC = () => {
               </div>
             ) : (
               /* Tasks View */
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col overflow-hidden">
                 {viewMode === 'grid' ? (
                   /* Grid View */
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="flex-1 overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
                     {tasks.map((task) => (
                       <div
                         key={task.id}
@@ -729,6 +734,7 @@ const ModernDesktopLayout: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                    </div>
                   </div>
                 ) : (
                   /* List View with AG-Grid */
@@ -927,6 +933,13 @@ const ModernDesktopLayout: React.FC = () => {
                     {/* Control Instructions */}
                     <ControlInstructions task={selectedTask} />
 
+                    {/* Additional Details */}
+                    {selectedTask.additionalInfo && (
+                      <AdditionalInfoTable 
+                        additionalInfo={selectedTask.additionalInfo} 
+                      />
+                    )}
+
                     {/* Notes */}
                     <div>
                       <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Notes</h4>
@@ -1017,6 +1030,20 @@ const ModernDesktopLayout: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Signoff Dialog */}
+      <SignoffDialog
+        isOpen={showSignoffDialog}
+        onClose={() => setShowSignoffDialog(false)}
+        selectedTasks={allTasks.filter(task => selectedTaskIds.has(task.id))}
+        onSubmit={(data) => {
+          console.log('Signoff submitted:', data);
+          // Here you would typically make an API call to submit the signoff
+          // For now, we'll just close the dialog and clear selection
+          setShowSignoffDialog(false);
+          setSelectedTaskIds(new Set());
+        }}
+      />
     </div>
   );
 };
