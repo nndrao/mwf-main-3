@@ -42,7 +42,7 @@ const TabletLayout: React.FC = () => {
 
     // Status filter
     switch (activeStatus) {
-      case 'overdue':
+      case 'outstanding':
         return task.status === 'overdue';
       case 'today':
         const today = new Date();
@@ -96,14 +96,8 @@ const TabletLayout: React.FC = () => {
       <div className="bg-[#D71E2B] text-white shadow-lg">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-white px-3 py-1.5 rounded">
-                <span className="text-[#D71E2B] font-bold text-lg">CM</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">Control Monitor</h1>
-                <p className="text-sm text-white/80">Task Management System</p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold">Control Monitor</h1>
             </div>
             
             <div className="flex items-center space-x-4">
@@ -207,7 +201,7 @@ const TabletLayout: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
                     <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                      {task.status}
+                      {task.status === 'overdue' ? 'outstanding' : task.status}
                     </span>
                     <div className="flex items-center space-x-1.5">
                       <div className={`w-2 h-2 rounded-full ${getPriorityColor(task.priority)}`} />

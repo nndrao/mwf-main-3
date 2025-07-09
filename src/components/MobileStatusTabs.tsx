@@ -11,7 +11,7 @@ interface MobileStatusTabsProps {
 const MobileStatusTabs: React.FC<MobileStatusTabsProps> = ({ tasks, activeStatus, onStatusChange }) => {
   const getCount = (status: string) => {
     switch (status) {
-      case 'overdue':
+      case 'outstanding':
         return tasks.filter(t => t.status === 'overdue').length;
       case 'today':
         const today = new Date();
@@ -34,7 +34,7 @@ const MobileStatusTabs: React.FC<MobileStatusTabsProps> = ({ tasks, activeStatus
 
   const tabs = [
     { id: 'all', label: 'All', icon: <Clock size={18} />, color: 'blue' },
-    { id: 'overdue', label: 'Overdue', icon: <AlertTriangle size={18} />, color: 'red' },
+    { id: 'outstanding', label: 'Outstanding', icon: <AlertTriangle size={18} />, color: 'red' },
     { id: 'today', label: 'Today', icon: <Calendar size={18} />, color: 'orange' },
     { id: 'upcoming', label: 'Upcoming', icon: <Clock size={18} />, color: 'yellow' },
     { id: 'completed', label: 'Done', icon: <CheckCircle size={18} />, color: 'green' }

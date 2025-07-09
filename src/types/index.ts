@@ -66,7 +66,7 @@ export interface TaskFilters {
 }
 
 export interface TaskStats {
-  overdue: number;
+  outstanding: number;
   today: number;
   upcoming: number;
   completed: number;

@@ -62,7 +62,7 @@ const ModernDesktopLayout: React.FC = () => {
     }
 
     switch (selectedFilter) {
-      case 'overdue':
+      case 'outstanding':
         return task.status === 'overdue';
       case 'today':
         const today = new Date();
@@ -82,7 +82,7 @@ const ModernDesktopLayout: React.FC = () => {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, count: null },
     { id: 'all', label: 'All Tasks', icon: FileText, count: allTasks.length },
-    { id: 'overdue', label: 'Overdue', icon: AlertTriangle, count: allTasks.filter(t => t.status === 'overdue').length, color: 'text-red-500' },
+    { id: 'outstanding', label: 'Outstanding', icon: AlertTriangle, count: allTasks.filter(t => t.status === 'overdue').length, color: 'text-red-500' },
     { id: 'today', label: 'Due Today', icon: Clock, count: allTasks.filter(t => {
       const today = new Date();
       const taskDate = new Date(t.dueDate);
@@ -159,11 +159,8 @@ const ModernDesktopLayout: React.FC = () => {
       <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
         {/* Top Header Bar */}
         <div className="bg-[#D71E2B] text-white px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-white px-3 py-1 rounded">
-              <span className="text-[#D71E2B] font-bold">CONTROL MONITOR</span>
-            </div>
-            <span className="text-sm">Task Management System</span>
+          <div>
+            <h1 className="text-2xl font-bold">Control Monitor</h1>
           </div>
           <div className="flex items-center space-x-6">
             <span className="text-sm">Support</span>
@@ -284,29 +281,31 @@ const ModernDesktopLayout: React.FC = () => {
                   />
                 </div>
 
-                {/* View Toggle */}
-                <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-1.5 rounded-md transition-all duration-200 ${
-                      viewMode === 'grid' 
-                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
-                        : 'text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    Grid
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`px-3 py-1.5 rounded-md transition-all duration-200 ${
-                      viewMode === 'list' 
-                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
-                        : 'text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    List
-                  </button>
-                </div>
+                {/* View Toggle - Only show when not on dashboard */}
+                {activeView !== 'dashboard' && (
+                  <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`px-3 py-1.5 rounded-md transition-all duration-200 ${
+                        viewMode === 'grid' 
+                          ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      Grid
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`px-3 py-1.5 rounded-md transition-all duration-200 ${
+                        viewMode === 'list' 
+                          ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                          : 'text-gray-600 dark:text-gray-400'
+                      }`}
+                    >
+                      List
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center space-x-3">
@@ -353,7 +352,7 @@ const ModernDesktopLayout: React.FC = () => {
                   <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Overdue</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Outstanding</p>
                         <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
                           {allTasks.filter(t => t.status === 'overdue').length}
                         </p>
@@ -416,7 +415,7 @@ const ModernDesktopLayout: React.FC = () => {
                           </div>
                           <div className="flex items-center space-x-3">
                             <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                              {task.status}
+                              {task.status === 'overdue' ? 'outstanding' : task.status}
                             </span>
                             <ChevronRight className="text-gray-400" size={20} />
                           </div>
@@ -537,7 +536,7 @@ const ModernDesktopLayout: React.FC = () => {
                             </td>
                             <td className="px-6 py-4">
                               <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusColor(task.status)}`}>
-                                {task.status}
+                                {task.status === 'overdue' ? 'outstanding' : task.status}
                               </span>
                             </td>
                             <td className="px-6 py-4">
@@ -664,7 +663,7 @@ const ModernDesktopLayout: React.FC = () => {
                         <div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                           <span className={`inline-flex px-2.5 py-1 text-sm font-medium rounded-full mt-1 ${getStatusColor(selectedTask.status)}`}>
-                            {selectedTask.status}
+                            {selectedTask.status === 'overdue' ? 'outstanding' : selectedTask.status}
                           </span>
                         </div>
                         <div>

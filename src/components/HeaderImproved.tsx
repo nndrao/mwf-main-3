@@ -18,14 +18,8 @@ const HeaderImproved: React.FC = () => {
       {/* Main header */}
       <div className="px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="bg-white px-3 py-1 rounded">
-              <span className="text-[#D71E2B] font-bold">CM</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight">Control Monitor</h1>
-              <p className="text-xs text-white/80">Task Management System</p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Control Monitor</h1>
           </div>
           
           <div className="flex items-center space-x-3">
