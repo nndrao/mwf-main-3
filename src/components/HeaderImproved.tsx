@@ -7,20 +7,20 @@ const HeaderImproved: React.FC = () => {
   const [showNotifications, setShowNotifications] = useState(false);
 
   const actions = [
-    { icon: Info, label: 'Request Info', color: 'from-blue-500 to-blue-600' },
-    { icon: MessageSquare, label: 'Add Notes', color: 'from-green-500 to-green-600' },
-    { icon: Activity, label: 'Activity', color: 'from-purple-500 to-purple-600' },
-    { icon: UserPlus, label: 'Delegate', color: 'from-orange-500 to-orange-600' },
+    { icon: Info, label: 'Request Info', color: 'bg-blue-600 hover:bg-blue-700' },
+    { icon: MessageSquare, label: 'Add Notes', color: 'bg-green-600 hover:bg-green-700' },
+    { icon: Activity, label: 'Activity', color: 'bg-purple-600 hover:bg-purple-700' },
+    { icon: UserPlus, label: 'Delegate', color: 'bg-orange-600 hover:bg-orange-700' },
   ];
 
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white safe-area-top shadow-lg">
+    <div className="bg-[#D71E2B] text-white safe-area-top shadow-lg">
       {/* Main header */}
       <div className="px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-white font-bold text-lg">CM</span>
+            <div className="bg-white px-3 py-1 rounded">
+              <span className="text-[#D71E2B] font-bold">CM</span>
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">Control Monitor</h1>
@@ -72,7 +72,7 @@ const HeaderImproved: React.FC = () => {
                 <button
                   key={index}
                   onClick={() => setShowActions(false)}
-                  className={`bg-gradient-to-r ${action.color} text-white py-3 px-4 rounded-xl text-sm font-semibold hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 active:scale-95`}
+                  className={`${action.color} text-white py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 active:scale-95`}
                 >
                   <Icon size={18} />
                   <span>{action.label}</span>

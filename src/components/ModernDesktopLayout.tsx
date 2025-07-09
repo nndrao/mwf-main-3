@@ -29,6 +29,7 @@ import { useTasks } from '../hooks/useTasks';
 import { format } from 'date-fns';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
+import ControlInstructions from './ControlInstructions';
 
 const ModernDesktopLayout: React.FC = () => {
   const [activeView, setActiveView] = useState('dashboard');
@@ -125,13 +126,35 @@ const ModernDesktopLayout: React.FC = () => {
 
   return (
     <ThemeProvider>
-      <div className="h-screen flex bg-gray-50 dark:bg-gray-900">
-        {/* Sidebar */}
-        <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+        {/* Top Header Bar */}
+        <div className="bg-[#D71E2B] text-white px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="bg-white px-3 py-1 rounded">
+              <span className="text-[#D71E2B] font-bold">CONTROL MONITOR</span>
+            </div>
+            <span className="text-sm">Task Management System</span>
+          </div>
+          <div className="flex items-center space-x-6">
+            <span className="text-sm">Support</span>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm">Joseph Vona</span>
+              <span className="text-xs">▼</span>
+            </div>
+            <button className="bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-1 rounded text-sm transition-colors">
+              Exit
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Sidebar */}
+          <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Logo Area */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-[#D71E2B] rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">CM</span>
               </div>
               <div>
@@ -157,7 +180,7 @@ const ModernDesktopLayout: React.FC = () => {
                     }}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${
                       isActive 
-                        ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                        ? 'bg-red-50 dark:bg-red-900/20 text-[#D71E2B] dark:text-red-400' 
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
@@ -167,7 +190,7 @@ const ModernDesktopLayout: React.FC = () => {
                     </div>
                     {item.count !== null && (
                       <span className={`text-sm font-semibold ${
-                        isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
+                        isActive ? 'text-[#D71E2B] dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
                       }`}>
                         {item.count}
                       </span>
@@ -211,10 +234,10 @@ const ModernDesktopLayout: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+          </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
           <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <div className="flex items-center justify-between">
@@ -257,7 +280,7 @@ const ModernDesktopLayout: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-3">
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
+                <button className="bg-[#D71E2B] hover:bg-[#B5181F] text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200">
                   <Plus size={20} />
                   <span>New Task</span>
                 </button>
@@ -291,8 +314,8 @@ const ModernDesktopLayout: React.FC = () => {
                         <p className="text-sm text-gray-600 dark:text-gray-400">Total Tasks</p>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{allTasks.length}</p>
                       </div>
-                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                        <FileText className="text-blue-600 dark:text-blue-400" size={24} />
+                      <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                        <FileText className="text-[#D71E2B] dark:text-red-400" size={24} />
                       </div>
                     </div>
                   </div>
@@ -614,6 +637,9 @@ const ModernDesktopLayout: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Control Instructions */}
+                    <ControlInstructions task={selectedTask} />
+
                     {/* Notes */}
                     <div>
                       <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Notes</h4>
@@ -703,6 +729,7 @@ const ModernDesktopLayout: React.FC = () => {
             </div>
           </div>
         )}
+        </div>
       </div>
     </ThemeProvider>
   );

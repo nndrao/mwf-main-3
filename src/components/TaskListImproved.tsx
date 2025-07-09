@@ -119,7 +119,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
             </div>
           </div>
           <button 
-            className="bg-blue-500 text-white p-3 rounded-xl hover:bg-blue-600 active:scale-95 transition-all duration-150 shadow-md"
+            className="bg-[#D71E2B] text-white p-3 rounded-xl hover:bg-[#B5181F] active:scale-95 transition-all duration-150 shadow-md"
           >
             <Plus size={24} />
           </button>
@@ -281,7 +281,7 @@ const TaskListImproved: React.FC<TaskListImprovedProps> = ({
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 safe-area-bottom shadow-2xl">
         <button
           onClick={onShowFilters}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-4 px-6 rounded-2xl text-base font-bold transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg active:scale-[0.98]"
+          className="w-full bg-[#D71E2B] hover:bg-[#B5181F] text-white py-4 px-6 rounded-2xl text-base font-bold transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg active:scale-[0.98]"
         >
           <Filter size={22} />
           <span>Filters & Search</span>
